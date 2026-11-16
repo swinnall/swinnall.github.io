@@ -24,6 +24,7 @@ button{font-family:inherit}
 
 .graph{position:relative;width:min(1180px,100%,calc((100vh - 190px) * 1.56));aspect-ratio:100/64;container-type:inline-size}
 .note{position:absolute;left:0;bottom:-28px;font-size:11px;font-style:italic;opacity:0.45;z-index:5}
+.gcap{display:none;position:absolute;left:0;right:0;top:-40px;margin:0;text-align:center;font-size:14px;font-weight:500;min-height:1.3em;z-index:5}
 .gl{position:absolute;height:0;transform-origin:0 0;transition:opacity 220ms}
 .node{position:absolute;width:0;height:0;padding:0;background:transparent;border:none;cursor:pointer;color:var(--ink);z-index:4;transition:opacity 260ms}
 .node .hit{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:36px;height:36px}
@@ -82,6 +83,11 @@ button{font-family:inherit}
   .pstep::before,.pstep.last::after{display:none}
   .pstep .pdot{position:absolute;left:-5px;top:2px;margin:0}
   .node.leaf .lt{display:none}
+  .node.hub .lt{left:0 !important;right:auto !important;top:11px !important;transform:translateX(-50%) !important;align-items:center !important;text-align:center !important}
+  .node.hub .lt span{font-size:10.5px !important}
+  .node.c .lt span{font-size:15px !important}
+  .node.c .lt{top:16px !important}
+  .gcap{display:block}
   .corner{font-size:9.5px}
 }
 @media (prefers-reduced-motion:reduce){.rise,.draw{animation:none}}
@@ -95,6 +101,7 @@ button{font-family:inherit}
 
 <div class="graph" id="graph" role="group" aria-label="Map of how biology underpins new technology">
 <span class="note">*Non-exhaustive</span>
+<p class="gcap" id="gcap" aria-live="polite"></p>
 </div>
 
 <div class="intro">
@@ -144,7 +151,7 @@ button{font-family:inherit}
     ['hw', 'Microbial fuel cells', 12, 47], ['hw', 'Rare-earth separation', 33, 46], ['hw', 'Biomining', 4, 55],
     ['phys', 'Quantum sensing', 60, 7], ['phys', 'Optogenetics', 80, 8], ['phys', 'Electroceuticals', 56, 15],
     ['phys', 'Focused ultrasound', 90, 18], ['phys', 'Neural interfaces', 91, 30], ['phys', 'Force–gene mapping', 80, 44],
-    ['phys', 'Microgravity biomanufacturing', 55, 39], ['phys', 'Organ-on-chip', 91, 52],
+    ['phys', 'Microgravity biomanufacturing', 57, 41], ['phys', 'Organ-on-chip', 91, 52],
     ['bp', 'Octopus-inspired grippers', 14, 61], ['bp', 'Neuromorphic chips', 39, 58], ['bp', 'Thermodynamic computing', 48, 63],
     ['bp', 'Artificial photosynthesis', 64, 61], ['bp', 'Bioenergetic engineering', 72, 54]
   ].map(function (l, i) { return { id: 'l' + i, hub: l[0], name: l[1], x: l[2], y: l[3] }; });
@@ -159,6 +166,7 @@ button{font-family:inherit}
   var g = document.getElementById('graph');
 
   // lines
+  var gcap = document.getElementById('gcap');
   var linkDefs = [];
   hubs.forEach(function (h) { linkDefs.push({ a: C, b: h, kind: 'hub', hub: h.id }); });
   leaves.forEach(function (l) { linkDefs.push({ a: hubById[l.hub], b: l, kind: 'leaf', leaf: l }); });
@@ -176,7 +184,7 @@ button{font-family:inherit}
     var isC = p.id === 'bio', isHub = !!hubById[p.id];
     var b = document.createElement('button');
     b.type = 'button';
-    b.className = 'node' + (!isC && !isHub ? ' leaf' : '');
+    b.className = 'node' + (!isC && !isHub ? ' leaf' : '') + (isHub ? ' hub' : '') + (isC ? ' c' : '');
     b.setAttribute('aria-label', isC ? 'Biology: show all branches' : p.name);
     var hit = document.createElement('span'); hit.className = 'hit'; hit.setAttribute('aria-hidden', 'true');
     var dot = document.createElement('span'); dot.className = 'dot'; dot.setAttribute('aria-hidden', 'true');
@@ -203,12 +211,19 @@ button{font-family:inherit}
       else { st.pin = st.pin === p.id ? null : p.id; }
       render();
     });
-    p.el = b; p.dot = dot; p.tx = tx; p.isC = isC; p.isHub = isHub;
+    p.el = b; p.dot = dot; p.tx = tx; p.lt = lt; p.isC = isC; p.isHub = isHub;
     g.appendChild(b);
   });
 
+  var mq = window.matchMedia('(max-width: 760px)');
+  function isMobile() { return mq.matches; }
+  function side(lt, left) {
+    lt.style.left = left ? '' : '14px'; lt.style.right = left ? '14px' : '';
+    lt.style.alignItems = left ? 'flex-end' : 'flex-start'; lt.style.textAlign = left ? 'right' : 'left';
+  }
+
   function warp(p) {
-    if (st.mx === null || !LENS) return { x: p.x, y: p.y, s: 1 };
+    if (st.mx === null || !LENS || isMobile()) return { x: p.x, y: p.y, s: 1 };
     var dx = p.x - st.mx, dy = p.y - st.my, d = Math.sqrt(dx * dx + dy * dy), R = 15;
     if (d >= R) return { x: p.x, y: p.y, s: 1 };
     var t = 1 - d / R;
@@ -216,6 +231,9 @@ button{font-family:inherit}
   }
 
   function render() {
+    var pinned = null; leaves.forEach(function (l) { if (l.id === st.pin) pinned = l; });
+    gcap.textContent = pinned ? pinned.name : (isMobile() ? 'Tap a dot' : '');
+    gcap.style.opacity = pinned ? 1 : 0.4;
     var W = {};
     all.forEach(function (p) { W[p.id] = warp(p); });
     var focus = st.pin || st.hov, branch = st.branch;
@@ -249,6 +267,7 @@ button{font-family:inherit}
       ds.boxSizing = 'border-box';
       ds.boxShadow = p.isC ? '0 0 0 6px ' + GROUND + ', 0 0 0 7px ' + INK : (on ? '0 0 0 4px ' + GROUND + ', 0 0 0 5px ' + INK : 'none');
       p.tx.style.opacity = (p.isC || p.isHub || on) ? 1 : 0.75;
+      if (!p.isC) side(p.lt, !p.isHub && p.x > 82);
     });
   }
 
@@ -261,6 +280,7 @@ button{font-family:inherit}
     if (!raf) raf = requestAnimationFrame(function () { raf = 0; render(); });
   });
   g.addEventListener('mouseleave', function () { st.mx = null; st.my = null; st.hov = null; render(); });
+  if (mq.addEventListener) mq.addEventListener('change', render);
   render();
 
   // reveals
