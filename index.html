@@ -46,17 +46,18 @@ button{font-family:inherit}
 
 #path{width:100%;max-width:1180px;margin-top:-16px;padding:0 0 120px;display:flex;flex-direction:column;gap:48px}
 #path h2{margin:0;font-size:clamp(26px,2.6vw,34px);font-weight:500;letter-spacing:-0.015em;line-height:1.1}
-.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:36px}
+.pwrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:36px;row-gap:24px;align-items:end}
 .br{display:flex;flex-direction:column;align-items:center;gap:10px;padding-right:24px;animation-delay:1150ms}
-.br span:first-child{font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.85;text-align:center}
+.bl{font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.85;text-align:center}
 .brace{position:relative;display:block;width:100%;height:10px;border:1px solid var(--ink);border-bottom:none;border-radius:3px 3px 0 0;opacity:0.55}
 .brace::after{content:"";position:absolute;left:50%;top:-7px;height:6px;border-left:1px solid var(--ink)}
 .b1{grid-row:1;grid-column:1}.b23{grid-row:1;grid-column:2 / span 2}.b4{grid-row:1;grid-column:4}
-.pline{position:absolute;left:4px;right:0;top:4px;height:0;border-top:1px solid var(--ink);opacity:0.35}
-.phead{position:absolute;right:1px;top:1px;width:7px;height:7px;animation-delay:1000ms}
-.phead i{display:block;width:7px;height:7px;border-top:1px solid var(--ink);border-right:1px solid var(--ink);transform:rotate(45deg);opacity:0.6}
-.pstep{position:relative;display:flex;flex-direction:column;gap:10px;padding-right:24px}
-.pdot{display:block;width:9px;height:9px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 5px var(--ground);margin-bottom:16px}
+.s1{grid-row:2;grid-column:1}.s2{grid-row:2;grid-column:2}.s3{grid-row:2;grid-column:3}.s4{grid-row:2;grid-column:4}
+.pstep::before{content:"";position:absolute;left:4px;top:4px;width:calc(100% + 36px);border-top:1px solid var(--ink);opacity:0.35}
+.pstep.last::before{width:calc(100% - 4px)}
+.pstep.last::after{content:"";position:absolute;right:1px;top:1px;width:7px;height:7px;border-top:1px solid var(--ink);border-right:1px solid var(--ink);transform:rotate(45deg);opacity:0.6}
+.pstep{position:relative;display:flex;flex-direction:column;gap:10px;padding-right:24px;align-self:start}
+.pdot{position:relative;z-index:1;display:block;width:9px;height:9px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 5px var(--ground);margin-bottom:16px}
 .pn{font-size:11px;letter-spacing:0.08em;opacity:0.5}
 .pstep h3{margin:0;font-size:20px;font-weight:500;letter-spacing:-0.01em;line-height:1.15}
 .pstep p{margin:0;font-size:14.5px;line-height:1.5;opacity:0.65}
@@ -70,10 +71,15 @@ button{font-family:inherit}
 [hidden]{display:none !important}
 
 @media (max-width:760px){
-  .pgrid{grid-template-columns:1fr;gap:28px}
-  .b1,.b23,.b4{grid-row:auto;grid-column:auto}
-  .pline,.phead{display:none}
+  .pwrap{grid-template-columns:minmax(0,1fr) 92px;column-gap:14px;row-gap:28px;align-items:stretch}
+  .s1{grid-row:1;grid-column:1}.s2{grid-row:2;grid-column:1}.s3{grid-row:3;grid-column:1}.s4{grid-row:4;grid-column:1}
+  .b1{grid-row:1;grid-column:2}.b23{grid-row:2 / span 2;grid-column:2}.b4{grid-row:4;grid-column:2}
+  .br{flex-direction:row;align-items:stretch;gap:10px;padding:0}
+  .bl{align-self:center;text-align:left;font-size:9.5px;line-height:1.35;order:2}
+  .brace{order:1;flex:none;width:8px;height:auto;border:1px solid var(--ink);border-left:none;border-radius:0 3px 3px 0}
+  .brace::after{left:auto;right:-7px;top:50%;width:6px;height:0;border-left:none;border-top:1px solid var(--ink)}
   .pstep{border-left:1px solid rgba(230,225,214,0.25);padding:0 0 0 20px}
+  .pstep::before,.pstep.last::after{display:none}
   .pstep .pdot{position:absolute;left:-5px;top:2px;margin:0}
   .node.leaf .lt{display:none}
   .corner{font-size:9.5px}
@@ -105,20 +111,14 @@ button{font-family:inherit}
 
 <section id="path" aria-label="From research to commercialisation" hidden>
 <h2 class="rise">From research to commercialisation</h2>
-<div style="display:flex;flex-direction:column;gap:24px">
-<div class="pgrid" style="align-items:end">
-<div class="br b1 rise"><span>I’ve published here</span><span class="brace" aria-hidden="true"></span></div>
-<div class="br b23 rise"><span>I invest here</span><span class="brace" aria-hidden="true"></span></div>
-<div class="br b4 rise"><span>I’ve advised pharma here</span><span class="brace" aria-hidden="true"></span></div>
-</div>
-<div class="pgrid" style="position:relative">
-<div class="pline draw" aria-hidden="true"></div>
-<span class="phead rise" aria-hidden="true"><i></i></span>
-<div class="pstep rise" style="animation-delay:250ms"><span class="pdot" aria-hidden="true"></span><span class="pn">01</span><h3>Research &amp; spinout</h3><p>University science, IP and a founding team becoming a company.</p></div>
-<div class="pstep rise" style="animation-delay:410ms"><span class="pdot" aria-hidden="true"></span><span class="pn">02</span><h3>Pre-seed</h3><p>Proof the technology works outside the lab.</p></div>
-<div class="pstep rise" style="animation-delay:570ms"><span class="pdot" aria-hidden="true"></span><span class="pn">03</span><h3>Seed</h3><p>Product, team and first pilots.</p></div>
-<div class="pstep rise" style="animation-delay:730ms"><span class="pdot" aria-hidden="true"></span><span class="pn">04</span><h3>Commercialisation</h3><p>First commercial partners and revenue.</p></div>
-</div>
+<div class="pwrap">
+<div class="br b1 rise"><span class="bl">I’ve published here</span><span class="brace" aria-hidden="true"></span></div>
+<div class="br b23 rise"><span class="bl">I invest here</span><span class="brace" aria-hidden="true"></span></div>
+<div class="br b4 rise"><span class="bl">I’ve advised pharma here</span><span class="brace" aria-hidden="true"></span></div>
+<div class="pstep s1 rise" style="animation-delay:250ms"><span class="pdot" aria-hidden="true"></span><span class="pn">01</span><h3>Research &amp; spinout</h3><p>University science, IP and a founding team becoming a company.</p></div>
+<div class="pstep s2 rise" style="animation-delay:410ms"><span class="pdot" aria-hidden="true"></span><span class="pn">02</span><h3>Pre-seed</h3><p>Proof the technology works outside the lab.</p></div>
+<div class="pstep s3 rise" style="animation-delay:570ms"><span class="pdot" aria-hidden="true"></span><span class="pn">03</span><h3>Seed</h3><p>Product, team and first pilots.</p></div>
+<div class="pstep s4 last rise" style="animation-delay:730ms"><span class="pdot" aria-hidden="true"></span><span class="pn">04</span><h3>Commercialisation</h3><p>First commercial partners and revenue.</p></div>
 </div>
 <div class="contact rise">
 <button type="button" class="more" id="contactBtn" aria-expanded="false" aria-controls="contact">Building at these intersections?<span class="arrow" aria-hidden="true">↓</span></button>
