@@ -233,7 +233,7 @@ button{font-family:inherit}
 
   function render() {
     var pinned = null; leaves.forEach(function (l) { if (l.id === st.pin) pinned = l; });
-    gcap.textContent = pinned ? pinned.name : (isMobile() ? 'Tap a dot' : '');
+    gcap.textContent = pinned ? pinned.name : '';
     gcap.style.opacity = pinned ? 1 : 0.4;
     var W = {};
     all.forEach(function (p) { W[p.id] = warp(p); });
